@@ -121,9 +121,9 @@ botonCompra.onclick= () => {
     carrito = [];
     calculoGastos();
     botonCompra.remove();
-    const pResultado = document.createElement('p');
-    pResultado.innerText = "Presione en Productos para operar nuevamente"
-    cuerpoProductos.appendChild(pResultado);
+    const botonVolverAComprar = document.createElement('button');
+    botonVolverAComprar.innerHTML = `<a href="productos.html" >Volver a operar</a>`;
+    cuerpoProductos.appendChild(botonVolverAComprar);
 };
 
 /////////////Funcion para calcular y mostrar los gastos
