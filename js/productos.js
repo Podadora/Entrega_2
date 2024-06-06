@@ -59,15 +59,18 @@ let productos = [
 ]
 
 ///////////// Muestra de Productos
-
-const divProductos = document.createElement('div');
+const divProductos = document.createElement('main');
 cuerpoProductos.appendChild(divProductos);
+muestraProductos();
 
-for (const producto of productos){
-    const li = document.createElement('li');
-    li.innerHTML = `Nombre: ${producto.descripcion} -- Precio: $${producto.precio} // CODIGO: ${producto.codigo} `;    
-    cuerpoProductos.appendChild(li);
-    botonesCompra(producto.codigo);
+
+function muestraProductos(){
+    for (const producto of productos){
+        const li = document.createElement('li');
+        li.innerHTML = `Nombre: ${producto.descripcion} -- Precio: $${producto.precio} // CODIGO: ${producto.codigo} `;    
+        divProductos.appendChild(li);
+        botonesCompra(producto.codigo);
+    }
 }
 
 /////////////Funcion para generar botones de productos
@@ -80,7 +83,7 @@ function botonesCompra (codigo){
         valor1.value ++;
     };
     botonMas.textContent = '+';
-    cuerpoProductos.appendChild(botonMas);
+    divProductos.appendChild(botonMas);
 
 
 // Input
@@ -88,7 +91,7 @@ function botonesCompra (codigo){
     input.style.width = '2rem';
     input.id = codigo;
     input.value = 0;
-    cuerpoProductos.appendChild(input);
+    divProductos.appendChild(input);
 
 
 // Botones Menos
@@ -104,32 +107,49 @@ function botonesCompra (codigo){
             valor1.value --;
     };
     botonMenos.textContent = '-';
-    cuerpoProductos.appendChild(botonMenos);
+    divProductos.appendChild(botonMenos);
 }
 
-///////////// Boton efectuar compra
-const espacioBoton = document.createElement('div');
+// Boton Compra
+const espacioBotonCompra = document.createElement('h2');
 const botonCompra = document.createElement('button');
 botonCompra.style.width = '4rem';
 botonCompra.textContent = 'Comprar';
-espacioBoton.appendChild(botonCompra);
-cuerpoProductos.appendChild(espacioBoton);
+espacioBotonCompra.appendChild(botonCompra);
+cuerpoProductos.appendChild(espacioBotonCompra);
 
-//Boton OnClick
+// Boton Admin
+const espacioBotonAdmin = document.createElement('h3');
+const botonAdmin = document.createElement('button');
+botonAdmin.textContent = 'Admin Mode';
+espacioBotonAdmin.appendChild(botonAdmin);
+cuerpoProductos.appendChild(espacioBotonAdmin);
+
+//BotonCompra OnClick
 
 botonCompra.onclick= () => {
     carrito = [];
+    const limpiarResultado = document.getElementById ("resultado");
+    limpiarResultado.remove();
     calculoGastos();
+    botonAdmin.remove();
+
+};
+
+//BotonAdmin OnClick
+
+botonAdmin.onclick= () => {
+    botonAdmin.remove();
+    divProductos.remove();
     botonCompra.remove();
-    const botonVolverAComprar = document.createElement('button');
-    botonVolverAComprar.innerHTML = `<a href="productos.html" >Volver a operar</a>`;
-    cuerpoProductos.appendChild(botonVolverAComprar);
+    adminMode();
 };
 
 /////////////Funcion para calcular y mostrar los gastos
 
 function calculoGastos(){
     const divCarrito = document.createElement('footer');
+    divCarrito.id = "resultado";
     cuerpoProductos.appendChild(divCarrito);
     let gastos = 0;
     for (const product of productos){
@@ -144,7 +164,7 @@ function calculoGastos(){
 
     for (const compras of carrito) {
         const divCompras = document.createElement('p')
-        divCompras.innerHTML = ` ${compras.nombre} -- Precio: $${compras.precio} // Cantidad: ${compras.cantidad} `;    
+        divCompras.innerHTML = ` ${compras.nombre} -- Precio: $${compras.precio} // Cantidad: ${compras.cantidad} Subtotal : $${compras.precio*compras.cantidad}`;    
         divCarrito.appendChild(divCompras);
     }
     const gastoTotal = document.createElement('p');
@@ -152,24 +172,107 @@ function calculoGastos(){
     divCarrito.appendChild(gastoTotal);
 }
 
-//Constructor productos para carrito
+/////////////Funcion para loguear como admin
+
+function adminMode(){
+
+    tituloProductos.innerText = "Ingrese Usuario y Contraseña"
+    const user = document.createElement('input');
+    const pass = document.createElement('input');
+    const aceptar = document.createElement('button');
+    aceptar.style.width = '4rem';
+    aceptar.textContent = "Aceptar";
+
+    cuerpoProductos.appendChild(user);
+    cuerpoProductos.appendChild(pass);
+    cuerpoProductos.appendChild(aceptar);
+
+    aceptar.onclick = () => {
+        if (user.value == "admin" && pass.value == "admin"){
+            modificacionLista();
+            aceptar.remove();
+            user.remove();
+            pass.remove();
+            tituloProductos.innerText = "Modificacion de Precios";
+
+        }else alert("Datos incorrectos ( es admin admin)");
+    }
+}
+/////////////Funcion para operar como admin
+
+function modificacionLista (){
+    const nuevoMain = document.createElement('main')
+    cuerpoProductos.appendChild(nuevoMain);
+    for (const variables of productos){
+        
+        const botonModificar = document.createElement('button');
+        botonModificar.innerText = "Modificar";
+        
+        const botonEliminar = document.createElement('button');
+        botonEliminar.innerText = ("Eliminar")
+        
+        const divisorProductos = document.createElement('p');
+        const codigo = document.createElement('input');
+        const precio = document.createElement('input');
+        const descripcion = document.createElement('input');
+        codigo.value = variables.codigo;
+        precio.value = variables.precio;
+        descripcion.value = variables.descripcion;
+        console.log(variables.codigo);
+        divisorProductos.appendChild(codigo);
+        divisorProductos.appendChild(precio);
+        divisorProductos.appendChild(descripcion);
+        divisorProductos.appendChild(botonModificar);
+        divisorProductos.appendChild(botonEliminar);
+        divisorProductos.id = variables.codigo;
+        nuevoMain.appendChild(divisorProductos);
+// Configuacion Boton Modificar Item
+        botonModificar.onclick = () => {
+            const indexModificar = productos.findIndex(obj => obj.descripcion === variables.descripcion);
+            if (indexModificar !== -1) {
+                productos[indexModificar].codigo = codigo.value;
+                productos[indexModificar].precio = precio.value;
+                productos[indexModificar].descripcion = descripcion.value;
+                alert("Modificacion Guardada correctamente");
+            }
+
+        }
+// Configuacion Boton eliminar ITEM
+        botonEliminar.onclick = () => {
+            nuevoMain.remove();
+            const indexBorrar = productos.findIndex(obj => obj.descripcion === variables.descripcion);
+            if (indexBorrar !== -1) {
+                productos.splice(indexBorrar, 1);
+            }
+            modificacionLista ();
+        }
+
+
+    }
+    // Configuacion Boton salir Admin
+    const botonSalirAdmin = document.createElement('button');
+    botonSalirAdmin.innerText = "Salir Admin";
+    cuerpoProductos.appendChild(botonSalirAdmin);
+    botonSalirAdmin.onclick = () =>{
+        nuevoMain.remove();
+        divProductos.innerHTML = '';
+        cuerpoProductos.appendChild(divProductos);
+        botonSalirAdmin.remove();
+        muestraProductos();
+        cuerpoProductos.appendChild(botonCompra);
+        cuerpoProductos.appendChild(botonAdmin);
+        tituloProductos.innerText = "Lista de Productos";
+    }
+
+    
+}
+
+/////////////Constructor productos para carrito
 
 class Producto {
     constructor(cantidad, nombre, precio) {
         this.cantidad = cantidad;
         this.nombre = nombre;
-        this.precio = parseFloat(precio);
-    }
-}
-// Constructor productos para tienda
-
-class Tienda {
-    constructor(descripcion, precio, codigo) {
-        this.descripcion = descripcion;
         this.precio = precio;
-        this.codigo = codigo;
     }
 }
-
-
-
