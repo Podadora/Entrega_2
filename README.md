@@ -1,2 +1,4 @@
 # Entrega_1
- Proyecto Entrega
+Simulador de Tienda
+
+Matias Omar Garcia
